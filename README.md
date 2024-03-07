@@ -9,9 +9,9 @@ https://github.com/TAIIPA/gait-velocity-estimation/assets/19821289/1aae39eb-0c72
 ```
 git clone https://github.com/MuhammadMoinFaisal/YOLOv8-DeepSORT-Object-Tracking.git
 ```
-- Goto the cloned folder.
+- Go to the cloned folder.
 ```
-cd YOLOv8-DeepSORT-Object-Tracking
+cd gait-velocity-estimation
 ```
 - Install the dependecies
 ```
@@ -22,6 +22,13 @@ pip install -e '.[dev]'
 ```
 cd ultralytics/yolo/v8/detect
 ```
+- Download deepsort parameters ckpt.t7
+```
+cd deep_sort/deep/checkpoint
+# download ckpt.t7 from 
+https://drive.google.com/drive/folders/1xhG0kRH1EX5B9_Iz8gQJb7UNnn_riXi6 to this folder
+```
+
 - Estimate gait velocity on gait video.
 
 ```
