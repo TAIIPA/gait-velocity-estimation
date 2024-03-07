@@ -1,9 +1,10 @@
 <H1 align="center">
 Gait Velocity (or Speed) Estimation with YOLOv8 Object Detection + DeepSORT Tracking </H1>
 
-https://github.com/unacanal/video-gait-velocity/assets/19821289/2e248ed1-7a0e-4c26-b495-7641b5a8abaf
+https://github.com/TAIIPA/gait-velocity-estimation/assets/19821289/1aae39eb-0c72-4c21-9397-2a49d10548ba
 
 ## Steps to run Code
+
 - Clone the repository
 ```
 git clone https://github.com/MuhammadMoinFaisal/YOLOv8-DeepSORT-Object-Tracking.git
