@@ -37,5 +37,5 @@ python estimate_velo.py model="yolov8n.pt" source="[YOUR GAIT VIDEO FILE]"
 [3] https://github.com/chaelin0722/Estimate_pedestrian_speed
 
 ### Todos
-- [] refactor "estimate_velo.py"
-- [] add description about setting "ppm"
+- [ ] refactor "estimate_velo.py"
+- [ ] add description about setting "ppm"
