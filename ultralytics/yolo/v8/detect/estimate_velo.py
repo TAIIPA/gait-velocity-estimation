@@ -14,7 +14,7 @@ from deep_sort_pytorch.utils.parser import get_config
 from deep_sort_pytorch.deep_sort import DeepSort
 from collections import deque
 import numpy as np
-# from points import get_point
+
 palette = (2 ** 11 - 1, 2 ** 15 - 1, 2 ** 20 - 1)
 data_deque = {}
 ss_deque = {}
@@ -29,6 +29,7 @@ object_counter1 = {}
 
 line = [(100, 500), (1050, 500)]
 speed_line_queue = {}
+
 
 def degree(start, end):
     x1, y1 = start
@@ -45,29 +46,21 @@ def degree(start, end):
 
     return angle_deg
 
-
-def get_point():
-
-    # 7813, 7818
-    # 왼 하단, 왼 상단, 오 상단, 오 하단
-    # point1 = np.array([[640, 1080], [640, 0], [1280, 0], [1280, 1080]], np.int32) # for cam1
-    point1 = np.array([[480, 920], [480, 360], [1800, 360], [1800, 900]], np.int32) # for cam3
-    # point1 = np.array([[720, 1080], [480, 720], [900, 360], [920,, 400]], np.int32) # for cam2
-    # point2 = np.array([[1966, 2050], [2500, 650], [3190, 780], [3089, 2150]], np.int32)
-
-    # 7806
-    point = np.array([[-300, 1500], [2300, 1400], [3570, 1600], [900, 2705]], np.int32)
-
-
+def get_point(filename):
+    # bottom left, top left, top right, bottom right
+    if "cam1" in filename:
+        point = np.array([[640, 1080], [640, 0], [1280, 0], [1280, 1080]], np.int32)
+    elif "cam2" in filename:
+        point = np.array([[720, 1080], [480, 720], [900, 360], [920, 400]], np.int32)
+    elif "cam3" in filename:
+        point = np.array([[480, 920], [480, 360], [1800, 360], [1800, 900]], np.int32)
+    
     # 좌표를 정점들로 변환합니다.
-    # points = points.reshape((-1, 1, 2))
-    point1 = point1.reshape((-1, 1, 2))
-    # point2 = point2.reshape((-1, 1, 2))
-    return point1, []
-
+    point = point.reshape((-1, 1, 2))
+    return point
 
 def check_intersect(box, filename):
-    point1, point2 = get_point()
+    point = get_point(filename)
 
     # 객체의 bbox 좌표로 다각형 객체 생성
     bx1, by1, w, h = box
@@ -75,86 +68,33 @@ def check_intersect(box, filename):
     rectangle = Polygon(rectangle_coords)
 
     # 왼쪽 인식존 다각형 객체 생성
-    parallelogram_coords1 = point1[1][0], point1[2][0], point1[3][0], point1[0][0]
-    parallelogram1 = Polygon(parallelogram_coords1)
+    parallelogram_coords = point[1][0], point[2][0], point[3][0], point[0][0]
+    parallelogram = Polygon(parallelogram_coords)
 
-    # 인식존 두개일 때
-    if len(point2) != 0:
-        # 오른쪽 인식존
-        parallelogram_coords2 = point2[1][0], point2[2][0], point2[3][0], point2[0][0]
-        parallelogram2 = Polygon(parallelogram_coords2)
-
-        # 두 다각형이 교차하는지 확인
-        if parallelogram1.intersects(rectangle):
-            return True
-        if parallelogram2.intersects(rectangle):
-            return True
-        else:
-            return False
-    # 인식존 하나일 때
-    else:
-        rectangle = Polygon(rectangle_coords)
-        # 두 다각형이 교차하는지 확인
-        if parallelogram1.intersects(rectangle):
-            return True
-
-        else:
-            return False
-
+    rectangle = Polygon(rectangle_coords)
+    # 두 다각형이 교차하는지 확인
+    return parallelogram.intersects(rectangle)
 
 def draw_rec(img, filename):
-    point1, point2 = get_point()
+    point = get_point(filename)
 
-    # 사각형 그리기
-    cv2.polylines(img, [point1], isClosed=True, color=(226, 43, 138), thickness=8)
-    # cv2.polylines(img, [point2], isClosed=True, color=(226, 43, 138), thickness=8)
+    # Draw polygon
+    cv2.polylines(img, [point], isClosed=True, color=(226, 43, 138), thickness=8)
 
-
-def get_distance(point, bcenter, filename, angle):
-    point1, point2 = get_point()
+def get_distance(bcenter, filename, angle):
+    point = get_point(filename)
     cx, cy = bcenter
 
-    # 왼쪽 인식존
-    if point == "1":
-        # 아래로 내려갈때 (수직거리)
-        if angle <= 0 and angle >= -180:
-            return point1[0][0][1] - cy
+    # 아래로 내려갈때 (수직거리)
+    if angle <= 0 and angle >= -180:
+        return point[0][0][1] - cy
 
-    # # 오른쪽 인식존
-    # if point == "2":
-    #     # 내려갈 때
-    #     if angle <= 0 and angle >= -180:
-    #         return point2[0][0][1] - cy
-    #     # 위로 올라 갈 때
-    #     if angle > 0 and angle <= 180:
-    #         return cy - int((point2[2][0][1]+point2[1][0][1])/2)
-
-    # # file IMG_7806 은 인식존 유형이 다르므로 다르게 처리(인식존 사각형이 누워있는 형태이기때문에 cx 와의 거리계산)
-    # if point == "3":
-    #     # 오른쪽에서 왼쪽
-    #     if angle <= 90 and angle >= -90:
-    #         return cx # - 0
-    #     # 왼쪽에서 오른쪽
-    #     else:
-    #         return int((point1[1][0][0] + point1[2][0][0])/2) - 60 - cx
-
-    #예외처리, 만약 거리 도출이 불가능하다면 none 반환
     return None
 
-
-# ETS(obs, data_deque[id][i])
 def ETS(speed, lr, filename, angle):
-
-
-    if filename == "7806":
-        ppm = 0.006
-        distance = get_distance("3", lr, filename, angle)
-    else:
-        ppm = 0.012
-        if lr[0] < 1500:
-            distance = get_distance("1", lr, filename, angle)
-        else:
-            distance = get_distance("2", lr, filename, angle)
+    ppm = 0.012
+    if lr[0] < 1500:
+        distance = get_distance(lr, filename, angle)
 
     if distance is None:
         return None
@@ -166,7 +106,6 @@ def ETS(speed, lr, filename, angle):
             t = 0
 
     return round(t, 2)
-
 
 def estimatespeed(Location1, Location2, filename):
     #Euclidean Distance Formula
@@ -293,10 +232,11 @@ def draw_boxes(img, bbox, names, object_id, filename, identities=None, offset=(0
         x2 += offset[0]
         y1 += offset[1]
         y2 += offset[1]
-        # box 좌표 순서
-        # (center_x, center_y, width, height)
-        # 객체의 센터 포인트
-        center = (int((x2+x1)/ 2), int((y1+y2)/2))
+        
+        
+        # BBox: (center_x, center_y, width, height)
+        # center coordinate of object
+        center = (int((x2 + x1) / 2), int((y1 + y2) / 2))
         # bottom center point
         #center = (int((x2+x1)/ 2), int((y2+y2)/2))
 
@@ -313,7 +253,7 @@ def draw_boxes(img, bbox, names, object_id, filename, identities=None, offset=(0
             ar_que30[id] = []
 
         label = "Person"
-        # 센터포인트를 데큐에 저장해서 사용하도록 하기
+        # 센터포인트를 데크에 저장해서 사용하도록 하기
         data_deque[id].appendleft(center)
         #img_deque.append(img)
         if len(data_deque[id]) >= 2:
@@ -327,7 +267,6 @@ def draw_boxes(img, bbox, names, object_id, filename, identities=None, offset=(0
             ar_que[id].append(angle)
 
             ss = sum(speed_line_queue[id]) / len(speed_line_queue[id])
-
 
             if len(speed_line_queue[id])%60 == 0:
                 # 이 전에 쌓인 값 초기화
@@ -425,11 +364,12 @@ class DetectionPredictor(BasePredictor):
             im = im[None]  # expand for batch dim
         self.seen += 1
 
-        # 인식존을 그리는 부분
+        
         filename = self.args.source.split("/")[-1].split(".")[0].split("_")[-1]
         im0 = im0.copy()
+        # Draw a polgon at the region of interest 
         # draw_rec(im0, filename)
-        # input 파일 이름을 기반으로 contour 처리된 영역의 초기 좌표값을 가져와서 프레임위에 표시
+        
         if self.webcam:  # batch_size >= 1
             log_string += f'{idx}: '
             frame = self.dataset.count
