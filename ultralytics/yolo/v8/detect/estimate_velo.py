@@ -93,8 +93,7 @@ def get_distance(bcenter, filename, angle):
 
 def ETS(speed, lr, filename, angle):
     ppm = 0.012
-    if lr[0] < 1500:
-        distance = get_distance(lr, filename, angle)
+    distance = get_distance(lr, filename, angle)
 
     if distance is None:
         return None
@@ -107,9 +106,9 @@ def ETS(speed, lr, filename, angle):
 
     return round(t, 2)
 
-def estimatespeed(Location1, Location2, filename):
-    #Euclidean Distance Formula
-    d_pixel = math.sqrt(math.pow(Location2[0] - Location1[0], 2) + math.pow(Location2[1] - Location1[1], 2))
+def estimatespeed(location1, location2, filename):
+    # Euclidean Distance
+    d_pixel = math.sqrt(math.pow(location2[0] - location1[0], 2) + math.pow(location2[1] - location1[1], 2))
     # defining thr pixels per meter
     if filename == "7806":
         ppm = 0.006
@@ -117,7 +116,7 @@ def estimatespeed(Location1, Location2, filename):
         # ppm = 0.0138333 # cam1
         ppm = 0.0045 # cam3
     # 실제 거리 meter 로
-    d_meters = d_pixel*ppm
+    d_meters = d_pixel * ppm
     # 30fps
     time_constant = 60
     speed = d_meters * time_constant
@@ -253,7 +252,7 @@ def draw_boxes(img, bbox, names, object_id, filename, identities=None, offset=(0
             ar_que30[id] = []
 
         label = "Person"
-        # 센터포인트를 데크에 저장해서 사용하도록 하기
+        # 객체의 센터포인트를 데크에 저장해서 사용하도록 하기
         data_deque[id].appendleft(center)
         #img_deque.append(img)
         if len(data_deque[id]) >= 2:
@@ -368,7 +367,7 @@ class DetectionPredictor(BasePredictor):
         filename = self.args.source.split("/")[-1].split(".")[0].split("_")[-1]
         im0 = im0.copy()
         # Draw a polgon at the region of interest 
-        # draw_rec(im0, filename)
+        draw_rec(im0, filename)
         
         if self.webcam:  # batch_size >= 1
             log_string += f'{idx}: '
