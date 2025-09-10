@@ -7,7 +7,7 @@ https://github.com/TAIIPA/gait-velocity-estimation/assets/19821289/1aae39eb-0c72
 
 - Clone the repository
 ```
-git clone https://github.com/MuhammadMoinFaisal/YOLOv8-DeepSORT-Object-Tracking.git
+git clone https://github.com/TAIIPA/gait-velocity-estimation
 ```
 - Go to the cloned folder.
 ```
